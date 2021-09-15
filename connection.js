@@ -2,6 +2,6 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 mongoose
-  .connect(process.env.DB)
+  .connect(process.env.ATLAS)
   .then(() => console.log("Connected to data base!"))
-  .catch((err) => console.error('DB connection error: ', err));
+  .catch((err) => console.error('DB connection error: ', err)); 

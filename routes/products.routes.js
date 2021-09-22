@@ -11,7 +11,10 @@ router.post('/products/new',
     .isLength({min:8, max:30}),
     body('description', 'La descripcion debe tener al menos 20 caracteres y no mas de 180...')
     .isLength({min:10, max:180}),
-    //add array and price validations later
+    body('specs', 'Debe agregar al menos una característica')
+    .isLength({min:1, max:20}),
+    body('price', 'Debe agregar un precio al producto.')
+    .notEmpty(),
     validateFields,
     newProduct
 );

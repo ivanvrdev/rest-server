@@ -1,11 +1,17 @@
-const ctrlProducts = {};
 const Product = require('../models/productos.model');
+const ctrlProducts = {};
 
 //GET
 ctrlProducts.allProducts = async (req, res) => {
-    const products = await Product.find({active: true});
-    res.json({products});
+    const query = {active: true};
+    const [total, products] = await Promise.all([
+        Product.count(query),
+        Product.find(query)
+    ])
+
+    res.json({total, products})
 }
+
 //POST
 ctrlProducts.newProduct = async (req, res) =>{
     const {name, description, specs, price} = req.body;

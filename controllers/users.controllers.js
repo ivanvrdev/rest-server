@@ -1,22 +1,38 @@
-const ctrlUsers = {};
+const bcryptjs = require('bcryptjs');
 const User = require('../models/users.model');
+const ctrlUsers = {};
 //GET
 //Obtener usuarios
-ctrlUsers.routeGET = async (req, res)=>{
-    const users = await User.find({active: true});
-    res.json(users);
+ctrlUsers.allUsers = async (req, res)=>{
+    const query = {active: true};
+    const [total, users] = await Promise.all([
+        User.count(query),
+        User.find(query)
+    ])
+    res.json({total, users});
 }
 //POST
 //Crear usuarios
-ctrlUsers.routePOST = async (req, res)=>{
-    const {username, pass} = req.body;
-    const user = new User({username, pass, active: true});
-    await user.save();
-    res.json({message: 'User created succesfully!'});
-}
+ctrlUsers.newUser = async (req, res)=>{
+    const {username, password} = req.body;
+
+    try{
+        const user = new User({username, password, active: true});
+        //Encriptación de contraseña
+        const salt = bcryptjs.genSaltSync();
+        user.password = bcryptjs.hashSync(password, salt);
+
+        await user.save();
+
+        res.json({msg: "User created successfully!",user});
+    }catch(e){
+        console.log('Error to create new user: ', e);
+    };
+};
+
 //PUT
 //Editar usuarios
-ctrlUsers.routePUT = async (req, res)=>{
+ctrlUsers.editUser = async (req, res)=>{
     const {id, username, pass} = req.body;
     const user = await User.findByIdAndUpdate(id, {username, pass}, {new: true});
     res.json({

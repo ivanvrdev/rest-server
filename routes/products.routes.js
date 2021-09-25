@@ -2,7 +2,7 @@ const router = require('express').Router();
 const {body} = require('express-validator');
 
 const {allProducts, newProduct} = require('../controllers/products.controllers');
-const {validateFields} = require('../helpers/validation');
+const {validateFields} = require('../middlewares/validation');
 
 router.get('/products/all', allProducts);
 

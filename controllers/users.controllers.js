@@ -1,9 +1,11 @@
 const bcryptjs = require('bcryptjs');
+const {request, response} = require('express');
 const User = require('../models/users.model');
+const {generateJWT} = require('../helpers/jwt.helpers')
 const ctrlUsers = {};
 //GET
 //Obtener usuarios
-ctrlUsers.allUsers = async (req, res)=>{
+ctrlUsers.getUser = async (req, res)=>{
     const query = {active: true};
     const [total, users] = await Promise.all([
         User.count(query),
@@ -13,49 +15,59 @@ ctrlUsers.allUsers = async (req, res)=>{
 }
 //POST
 //Crear usuarios
-ctrlUsers.newUser = async (req, res)=>{
-    const {username, password} = req.body;
+ctrlUsers.createUser = async (req, res)=>{
+    const {username, password, role} = req.body;
 
     try{
-        const user = new User({username, password, active: true});
+        const user = new User({username, password, role, active: true});
         //Encriptación de contraseña
         const salt = bcryptjs.genSaltSync();
         user.password = bcryptjs.hashSync(password, salt);
 
         await user.save();
 
-        res.json({msg: "User created successfully!",user});
+        const token = generateJWT({id: user.id});
+        res.json({msg: "User created successfully!", token});
     }catch(e){
         console.log('Error to create new user: ', e);
+        res.json({msg: "Error to create new user..."});
     };
 };
 
 //PUT
 //Editar usuarios
-ctrlUsers.editUser = async (req, res)=>{
-    const {id, username, pass} = req.body;
-    const user = await User.findByIdAndUpdate(id, {username, pass}, {new: true});
-    res.json({
-        message: 'User updated succesfully!',
-        user
-    })
-}
-//Eliminación lógica de usuarios
-ctrlUsers.routePUTDelete = async (req, res)=>{
-    const {id} = req.body;
-    const user = await User.findByIdAndUpdate(id, {active: false}, {new: true});
-    res.json({message: 'User deleted succesfuly!'});
-} 
-//DELETE
-//Eliminación física de usuarios
-ctrlUsers.routeDELETE = async (req, res) =>{
-    const {id} = req.body;
+ctrlUsers.editUser = async (req = request, res = response)=>{
+    const {uid} = req.params;
+    let {username, password, role, ...others} = req.body;
+
+    if(password){
+        const salt = bcryptjs.genSaltSync();
+        password = bcryptjs.hashSync(password, salt);
+    }
+
     try{
-        await User.findByIdAndDelete(id);
-        res.json({message: 'User deleted succesfuly!'});
-    }catch(err){
-        console.log('Error to delete the user: ', err);
+        const user = await User.findByIdAndUpdate(uid, {username, password, role}, {new: true});
+        res.json({
+            message: 'User updated succesfully!'
+        })
+    }catch(e){
+        console.log('Error to update user: ', e);
+        res.json({msg: "Error to update user..."});
     }
 }
+
+//Eliminación lógica de usuarios
+ctrlUsers.deleteUser = async (req = request, res = response)=>{
+    const {uid} = req.params;
+
+    try{
+        const user = await User.findByIdAndUpdate(uid, {active: false}, {new: true});
+        res.json({message: 'User deleted succesfuly!'});
+    }catch(e){
+        console.log('Error to delete user: ', e);
+        res.json({msg: "Error to delete user..."});
+    }
+
+} 
 
 module.exports = ctrlUsers;

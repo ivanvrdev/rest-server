@@ -1,12 +1,13 @@
 const router = require('express').Router();
-const {allUsers, newUser, editUser, routePUTDelete, routeDELETE} = require('../controllers/users.controllers');
-const {userValidation} = require('../middlewares/user.middlewares');
+const {getUser, createUser, editUser, deleteUser } = require('../controllers/users.controllers');
+const {createUserMW, editUserMW, deleteUserMW} = require('../middlewares/user.middlewares');
+const {validateJWT} = require('../middlewares/validateJWT');
 
 //Rutas
-router.get('/users/all', allUsers);
-router.post('/users/new',userValidation, newUser);
-router.put('/users/edit', editUser);
-router.put('/users/delete', routePUTDelete); //Eliminación lógica
-router.delete('/users/delete', routeDELETE); //Eliminación física
+router.use(validateJWT);
+router.get('/get-user', getUser);
+router.post('/create-user/', createUserMW, createUser);
+router.put('/edit-user/:uid', editUserMW, editUser);
+router.put('/delete-user/:uid',deleteUserMW, deleteUser); //Eliminación lógica
 
 module.exports = router;

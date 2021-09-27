@@ -1,0 +1,9 @@
+.env:
+MYDB='mongodb+srv://ivandeveloper:44558441@cluster0.4ixut.mongodb.net/db1?retryWrites=true&w=majority'
+SECRET='1T1S4S3CR3T'
+
+admin user:
+{
+    "username":"root@gmail.com",
+    "password":"root1234"
+}

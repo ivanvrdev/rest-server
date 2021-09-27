@@ -2,16 +2,17 @@ const User = require('../models/users.model');
 const {request} = require('express');
 
 const existsEmail = async(email, {req = request}) =>{
-    const uid = req.params.uid;
-    if (uid) {
-        const users = await User.find({username: email});
-        const exists = users.find(user => user.id != uid);
-        if(exists){
-            throw new Error('Email exists');
-        } 
-    } else{
-        const exists = await User.findOne({username: email});
-        if(exists){
+
+    const user = await User.findOne({username: email});
+
+    if(user){
+        const uid = req.params.uid;
+        
+        if(uid){
+            if(user.id != uid){
+                throw new Error('Email exists');
+            } 
+        }else{
             throw new Error('Email exists');
         }
     }

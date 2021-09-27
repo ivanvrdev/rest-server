@@ -5,7 +5,9 @@ const {canEdit, canCreate} = require('./validateRoles');
 const {existsEmail} = require('./validateEmail');
 const {uidIsCorrect} = require('./validateUID');
 
-const createUserMW = [
+const middlewares = {};
+
+middlewares.createUserMW = [
     canCreate,
     body('username', 'The email is not well formed').isEmail(),
     body('username', 'The email exists').custom(existsEmail),
@@ -14,7 +16,7 @@ const createUserMW = [
     validateFields
 ];
 
-const editUserMW = [
+middlewares.editUserMW = [
     canEdit,
     uidIsCorrect,
     body('username', 'The email is not well formed').isEmail(),
@@ -24,8 +26,16 @@ const editUserMW = [
     validateFields
 ];
 
-const deleteUserMW = [
-    canEdit
+middlewares.deleteUserMW = [
+    canEdit,
+    uidIsCorrect
 ];
 
-module.exports = {createUserMW, editUserMW, deleteUserMW};
+middlewares.loginUserMW = [
+    body('username', 'Add an email').exists(),
+    body('username', 'The email is not well formed').isEmail(),
+    body('password', 'Add a password').exists(),
+    validateFields
+];
+
+module.exports = middlewares;

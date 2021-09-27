@@ -2,11 +2,11 @@ const User = require('../models/users.model');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const getRole = async(token) =>{
+const getUserRole = async(token) =>{
     try{
-        const decodedToken = jwt.verify(token, process.env.SECRET);
+        const payload = jwt.verify(token, process.env.SECRET);
 
-        const {role} = await User.findById(decodedToken.id);
+        const {role} = await User.findById(payload.uid);
     
         return role;
     }catch(e){
@@ -14,4 +14,4 @@ const getRole = async(token) =>{
     }
 }
 
-module.exports = {getRole};
+module.exports = {getUserRole};

@@ -14,6 +14,32 @@ ctrlUsers.getUser = async (req, res)=>{
     res.json({total, users});
 }
 //POST
+ctrlUsers.loginUser = async (req, res)=>{
+    const {username, password} = req.body;
+
+    try {
+        const user = await User.findOne({username});
+
+        if (user) {
+            if (bcryptjs.compareSync(password, user.password)) {
+                const uid = user._id;
+                const token = generateJWT({uid});
+                res.json({
+                    msg: 'Welcome!', 
+                    token
+                });
+            } else{
+                res.json({msg: 'Access denied'});
+            }
+        }else{
+            res.json({msg: 'Access denied'});
+        }
+    } catch (e) {
+        console.log('Error to login user', e);
+        res.json({msg: 'Error to login user! Try it again later...'});
+    }
+}
+
 //Crear usuarios
 ctrlUsers.createUser = async (req, res)=>{
     const {username, password, role} = req.body;
@@ -21,13 +47,12 @@ ctrlUsers.createUser = async (req, res)=>{
     try{
         const user = new User({username, password, role, active: true});
         //Encriptación de contraseña
-        const salt = bcryptjs.genSaltSync();
+        const salt = bcryptjs.genSaltSync(10);
         user.password = bcryptjs.hashSync(password, salt);
 
         await user.save();
 
-        const token = generateJWT({id: user.id});
-        res.json({msg: "User created successfully!", token});
+        res.json({msg: "User created successfully!"});
     }catch(e){
         console.log('Error to create new user: ', e);
         res.json({msg: "Error to create new user..."});
@@ -38,12 +63,10 @@ ctrlUsers.createUser = async (req, res)=>{
 //Editar usuarios
 ctrlUsers.editUser = async (req = request, res = response)=>{
     const {uid} = req.params;
-    let {username, password, role, ...others} = req.body;
+    let {username, password, role} = req.body;
 
-    if(password){
-        const salt = bcryptjs.genSaltSync();
-        password = bcryptjs.hashSync(password, salt);
-    }
+    const salt = bcryptjs.genSaltSync();
+    password = bcryptjs.hashSync(password, salt);
 
     try{
         const user = await User.findByIdAndUpdate(uid, {username, password, role}, {new: true});

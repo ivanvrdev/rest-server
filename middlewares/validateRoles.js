@@ -1,8 +1,8 @@
-const {getRole} = require('../helpers/roles.helpers');
+const {getUserRole} = require('../helpers/roles.helpers');
 
 const canCreate = async(req, res, next) =>{
     const token = req.headers['token'];
-    const role = await getRole(token);
+    const role = await getUserRole(token);
     if (!(role == 'admin' || role == 'colaborator')) {
         res.json({msg: 'Access denied'})
         return;
@@ -12,7 +12,7 @@ const canCreate = async(req, res, next) =>{
 
 const canEdit = async(req, res, next) =>{
     const token = req.headers['token'];
-    const role = await getRole(token);
+    const role = await getUserRole(token);
     if (!(role == 'admin')) {
         res.json({msg: 'Access denied'})
         return;

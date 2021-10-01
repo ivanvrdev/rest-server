@@ -1,5 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
+const helmet = require('helmet');
+const cors = require('cors');
 require('dotenv').config();
 
 //Connection
@@ -9,6 +11,8 @@ const app = express();
 
 //Middlewares
 app.use(morgan('dev'));
+app.use(helmet());
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 

@@ -1,23 +1,17 @@
-const {getUserRole} = require('../helpers/roles.helpers');
+const {request} = require('express')
 
-const canCreate = async(req, res, next) =>{
-    const token = req.headers['token'];
-    const role = await getUserRole(token);
-    if (!(role == 'admin' || role == 'colaborator')) {
-        res.json({msg: 'Access denied'})
-        return;
+const validateRoles = (...roles) =>{
+    return (req = request, res, next) =>{
+        if(!roles.includes(req.user.role)){
+            return res.json({msg:'Access denied'});
+        }
+        next();
     }
-    next();
 }
 
-const canEdit = async(req, res, next) =>{
-    const token = req.headers['token'];
-    const role = await getUserRole(token);
-    if (!(role == 'admin')) {
-        res.json({msg: 'Access denied'})
-        return;
-    }
-    next();
-}
+module.exports = {validateRoles};
 
-module.exports = {canCreate, canEdit};
+
+
+
+

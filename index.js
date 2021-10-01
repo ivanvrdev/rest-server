@@ -16,9 +16,8 @@ app.use(express.urlencoded({extended: false}));
 app.set('port', process.env.PORT || 3000);
 
 //Routes
-app.use(require('./routes/notes.routes'));
 app.use(require('./routes/users.routes'));
-app.use(require('./routes/products.routes'));
+app.use(require('./routes/auth.routes'));
 app.listen(app.get('port'), ()=>console.log(`Server run on port ${app.get('port')}`));
 
 

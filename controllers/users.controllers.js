@@ -1,7 +1,6 @@
 const bcryptjs = require('bcryptjs');
 const {request, response} = require('express');
 const User = require('../models/users.model');
-const {generateJWT} = require('../helpers/jwt.helpers')
 const ctrlUsers = {};
 //GET
 //Obtener usuarios
@@ -13,33 +12,8 @@ ctrlUsers.getUser = async (req, res)=>{
     ])
     res.json({total, users});
 }
+
 //POST
-ctrlUsers.loginUser = async (req, res)=>{
-    const {username, password} = req.body;
-
-    try {
-        const user = await User.findOne({username});
-
-        if (user) {
-            if (bcryptjs.compareSync(password, user.password)) {
-                const uid = user._id;
-                const token = generateJWT({uid});
-                res.json({
-                    msg: 'Welcome!', 
-                    token
-                });
-            } else{
-                res.json({msg: 'Access denied'});
-            }
-        }else{
-            res.json({msg: 'Access denied'});
-        }
-    } catch (e) {
-        console.log('Error to login user', e);
-        res.json({msg: 'Error to login user! Try it again later...'});
-    }
-}
-
 //Crear usuarios
 ctrlUsers.createUser = async (req, res)=>{
     const {username, password, role} = req.body;

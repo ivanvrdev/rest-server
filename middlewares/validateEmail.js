@@ -1,20 +1,11 @@
 const User = require('../models/users.model');
-const {request} = require('express');
 
-const existsEmail = async(email, {req = request}) =>{
+const existsEmail = async(email) =>{
 
     const user = await User.findOne({username: email});
 
     if(user){
-        const uid = req.params.uid;
-        
-        if(uid){
-            if(user.id != uid){
-                throw new Error('Email exists');
-            } 
-        }else{
-            throw new Error('Email exists');
-        }
+        throw new Error("Email exists");
     }
 }
 

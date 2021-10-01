@@ -1,14 +1,14 @@
 
 const {body} = require('express-validator');
 const {validateFields} = require('./validateFields');
-const {canEdit, canCreate} = require('./validateRoles');
+const {validateRoles} = require('./validateRoles');
 const {existsEmail} = require('./validateEmail');
 const {uidIsCorrect} = require('./validateUID');
 
 const middlewares = {};
 
 middlewares.createUserMW = [
-    canCreate,
+    validateRoles('admin', 'colaborator'),
     body('username', 'The email is not well formed').isEmail(),
     body('username', 'The email exists').custom(existsEmail),
     body('password', 'The password must contain between 8 and 20 characters').isLength({max:20, min:8}),
@@ -17,7 +17,7 @@ middlewares.createUserMW = [
 ];
 
 middlewares.editUserMW = [
-    canEdit,
+    validateRoles('admin'),
     uidIsCorrect,
     body('username', 'The email is not well formed').isEmail(),
     body('username', 'The email exists').custom(existsEmail),
@@ -27,15 +27,8 @@ middlewares.editUserMW = [
 ];
 
 middlewares.deleteUserMW = [
-    canEdit,
+    validateRoles('admin'),
     uidIsCorrect
-];
-
-middlewares.loginUserMW = [
-    body('username', 'Add an email').exists(),
-    body('username', 'The email is not well formed').isEmail(),
-    body('password', 'Add a password').exists(),
-    validateFields
 ];
 
 module.exports = middlewares;
